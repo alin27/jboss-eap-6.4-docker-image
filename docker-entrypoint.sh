@@ -4,8 +4,8 @@
 # Default usage: docker-entrypoint.sh start-jboss
 #
 # Default value of environment variables:
-#     JBOSS_USER=jbossadmin
-#     JBOSS_PASSWORD=jboss@dmin1
+#     JBOSS_USER=admin
+#     JBOSS_PASSWORD=jadminpw-7
 #
 #     JBOSS_MODE=standalone
 #     JBOSS_CONFIG=standalone.xml
@@ -13,7 +13,7 @@
 
 # set -e
 
-export JBOSS_HOME=$HOME/EAP-6.4.0/jboss-eap-6.4
+export JBOSS_HOME=/home/jboss/EAP-6.4.0/jboss-eap-6.4
 export JBOSS_CLI=$JBOSS_HOME/bin/jboss-cli.sh
 export PATH=/home/jboss/EAP-6.4.0/jboss-eap-6.4/bin:$PATH
 
@@ -22,10 +22,10 @@ export PATH=/home/jboss/EAP-6.4.0/jboss-eap-6.4/bin:$PATH
 # Determine JBoss configuration (parse environment variables)
 #
 if [ -z "$JBOSS_USER" ]; then
-    JBOSS_USER=jbossadmin
+    JBOSS_USER=admin
 fi
 if [ -z "$JBOSS_PASSWORD" ]; then
-    JBOSS_PASSWORD=jboss@dmin1
+    JBOSS_PASSWORD=jadminpw-7
 fi
 if [ -z "$JBOSS_MODE" ]; then
     JBOSS_MODE=standalone
@@ -64,14 +64,18 @@ function wait_for_server() {
 
 
 #
+# Set JBoss admin user / password
+#
+gosu jboss $JBOSS_HOME/bin/add-user.sh -s -u $JBOSS_USER -p $JBOSS_PASSWORD
+
+#
 # Start JBoss EAP server
 #
 echo "=> Starting JBoss EAP server"
-exec nohup $JBOSS_HOME/bin/$JBOSS_MODE.sh -b 0.0.0.0 -bmanagement 0.0.0.0 -c $JBOSS_CONFIG > /var/log/jboss/console.log 2>&1 &
+exec gosu jboss nohup $JBOSS_HOME/bin/$JBOSS_MODE.sh -b 0.0.0.0 -bmanagement 0.0.0.0 -c $JBOSS_CONFIG > /var/log/jboss/console.log 2>&1 &
 
 echo "=> Waiting for the server to boot"
 wait_for_server
 
 echo "=> JBoss EAP server startup complete"
-
-exec "$@"
+exec gosu jboss "$@"

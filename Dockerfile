@@ -56,12 +56,13 @@ RUN $JBOSS_HOME/bin/jboss-cli.sh "patch apply $INSTALLDIR/distribution/jboss-eap
 RUN $JBOSS_HOME/bin/jboss-cli.sh "patch apply $INSTALLDIR/distribution/jboss-eap-6.4.17-patch.zip"
 
 ############################################
-# Add jboss admin
+# Create start script to run EAP instance
 ############################################
-ARG JBOSS_USER=admin
-ARG JBOSS_PASSWORD=jadminpw-7
+USER root
 
-RUN $JBOSS_HOME/bin/add-user.sh -s -u $JBOSS_USER -p $JBOSS_PASSWORD
+RUN apt-get -y install curl
+RUN curl -o /usr/local/bin/gosu -SL "https://github.com/tianon/gosu/releases/download/1.3/gosu-amd64" \
+&& chmod +x /usr/local/bin/gosu
 
 ############################################
 # Remove install artifacts
@@ -81,12 +82,10 @@ RUN mkdir /var/log/jboss/
 RUN chown jboss:jboss /var/log/jboss/
 
 COPY docker-entrypoint.sh /
-RUN chmod 700 /docker-entrypoint.sh && chown -R jboss:jboss /docker-entrypoint.sh
+RUN chmod 700 /docker-entrypoint.sh
 
 ############################################
 # Start JBoss in stand-alone mode
 ############################################
-USER jboss
-
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["start-jboss"]
