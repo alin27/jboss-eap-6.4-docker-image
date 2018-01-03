@@ -73,5 +73,3 @@ echo "=> Waiting for the server to boot"
 wait_for_server
 
 echo "=> JBoss EAP server startup complete"
-
-exec "$@"
