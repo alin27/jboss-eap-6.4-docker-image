@@ -8,13 +8,13 @@ Create a folder called "distribution" in the same directory as this project. Put
 ## Usage
 Build the image
 ```
-cd <*path to this project*>
-docker build -t <*name of your docker image*> .
+cd *<path to this project>*
+docker build -t *<name of your docker image>* .
 ```
 
 To run it,
 ```
-docker run -P -it --rm --name <*name of your container*> <*name of your docker image*> bash
+docker run -P -it --rm --name *<name of your container> <name of your docker image>* bash
 ```
 
 This will start an interactive bash prompt as user "jboss" inside the container. The admin console can be accessed via port 9990.
